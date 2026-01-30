@@ -71,3 +71,56 @@ PlayerRoot
 
 **Açıklama:**
 > İskeleti inceledikten sonra onayladım ve bana PlayerController.cs'in dolu halini verdi.
+
+## Prompt 4: [Interactable Mimarisi Tanıtımı]
+
+**Araç:** GoogleAIStudio/Gemini 3 Pro
+**Tarih/Saat:** 2026-01-30 , 16:47
+
+**Prompt:**
+>  İstediğim mimaride, Interactor = Player, Interactables = Door, Lever, Chest, Button vs. Her Interactable, Player'ı dinlemeli, Player'dan gelecek Invoke'larla koşulları da sağlıyorsa (Örn: Kapı, kilitli ise açılmaz , Kapı, çok uzakta değil) kendi event'ini tetiklemeli.
+Door/Light switch = toggleInteraction, Stateleri: Kapalı/Açık
+Chest = holdInteraction, Stateleri: Kapalı/Açılıyor/Açık, "Açılıyor" tamamlanmaz ise "Kapalı"ya geri dönüş.
+Key = instantInteraction, Raycast koşulları sağlandığı sırada "E" tuşuna basılarak envantere alınacak.
+Özet: Interactables oyuncuyu dinleyecek, raycast edilmiş ve koşulları sağlanmış, oyuncuya en yakın Interactable, event'ini tetikleyecek.
+
+**Alınan Cevap (Özet):**
+> Anladım. Publisher-Subscriber mantığına yakın, ancak Raycast ile aktif olarak seçilen nesnenin tetiklendiği bir yapı istiyorsunuz.
+
+Sistem şu şekilde işleyecek:
+IInteractable Interface: Tüm etkileşimli nesnelerin ortak sözleşmesi.
+InteractionDetector (Player'da): Raycast atar, IInteractable bulur ve "E"ye basılınca (veya basılı tutulunca) bu interface üzerindeki metodları çağırır.
+BaseInteractable (Abstract Class): Ortak özellikleri (mesafe kontrolü, prompt text vb.) tutar.
+Concrete Classes: Door, Chest vb. kendi özel mantıklarını (StateMachine gibi) yönetir.
+
+Bir de iskeleti verdi ama burada asıl olarak sistemi ne kadar anladığını kontrol ettim. 
+
+
+
+**Nasıl Kullandım:**
+- [ ] Direkt kullandım
+- [x] Adapte ettim
+- [ ] Reddettim
+
+**Açıklama:**
+> Gitmek istediğim yer tam olarak Publisher-Subscriber noktasıydı, bu sistemi bir kez anladığında bir daha açıklama yapmam gerekmediğini düşündüm ve iyice anlamasını sağlamak için bir sonraki promptta:
+"
+3.1 Door (Kapı)
+Açılıp kapanabilen kapı
+Locked/Unlocked state
+Kilitli ise "Anahtar gerekli" mesajı
+Toggle interaction type
+3.2 Key Pickup (Anahtar)
+Instant interaction ile toplanabilir
+Basit envantere eklenmeli
+Farklı kapılar için farklı anahtarlar (en az 2 tip)
+3.3 Switch/Lever (Anahtar/Kol)
+Toggle interaction
+Başka bir nesneyi tetikleyebilmeli (örn: kapıyı açar)
+Event-based connection
+3.4 Chest/Container (Sandık)
+Hold interaction ile açılır (örn: 2 saniye basılı tut)
+İçinde item bulunabilir
+Açıldıktan sonra tekrar açılamaz
+"
+doğrudan case-document dosyasından bu bölümü gönderdim, iskeleti kontrol edip onayladım.
