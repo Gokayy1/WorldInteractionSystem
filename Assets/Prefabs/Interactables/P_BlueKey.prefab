@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1416446082140215308}
   - component: {fileID: 950704209888215755}
   m_Layer: 3
-  m_Name: P_RedKey
+  m_Name: P_BlueKey
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_PromptMessage: Press 'E' to Collect
   m_HoldDuration: 0
   m_IsLocked: 0
-  m_KeyData: {fileID: 11400000, guid: 7fec7e743ed8a614c87e475cdae54eb6, type: 2}
+  m_KeyData: {fileID: 11400000, guid: 2e6e65529c965c441939c2cd0cd08a54, type: 2}
 --- !u!1 &5688304680241147229
 GameObject:
   m_ObjectHideFlags: 0
@@ -114,7 +114,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fb9be51863cf7cc4babdf29ee9529df4, type: 2}
+  - {fileID: 2100000, guid: 54891d71e7180344d8fa4ad5aa4e314d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

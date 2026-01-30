@@ -71,5 +71,24 @@ namespace InteractionSystem.Runtime.Player
         {
             AddGold(50); // Test
         }
+
+        public void RemoveKey(KeyData key)
+        {
+            if (key != null && m_Keys.ContainsKey(key))
+            {
+                m_Keys[key]--; // Sayıyı azalt
+
+                // Eğer 0 veya altına düştüyse listeden tamamen çıkar
+                if (m_Keys[key] <= 0)
+                {
+                    m_Keys.Remove(key);
+                }
+
+                Debug.Log($"Inventory: Used {key.KeyName}. Remaining: {(m_Keys.ContainsKey(key) ? m_Keys[key] : 0)}");
+                
+                // UI'ı güncelle
+                OnInventoryChanged?.Invoke();
+            }
+        }
     }
 }

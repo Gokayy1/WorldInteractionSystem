@@ -44,11 +44,10 @@ namespace InteractionSystem.Runtime.Interactables
                     var inventory = interactor.GetComponent<SimpleInventory>();
                     if (inventory != null && inventory.HasKey(m_RequiredKey))
                     {
-                        // Anahtar var! Kilidi aç.
+                        inventory.RemoveKey(m_RequiredKey);
+
                         Debug.Log($"Unlocked using {m_RequiredKey.KeyName}");
                         m_IsLocked = false;
-                        // Kilidi açtık, şimdi kapıyı açmak için devam edebiliriz veya 
-                        // bir sonraki tıklamayı bekleyebiliriz. Genelde kullanıcı kilidi açınca kapı da açılsın ister.
                     }
                     else
                     {
@@ -78,7 +77,40 @@ namespace InteractionSystem.Runtime.Interactables
             {
                 return m_RequiredKey != null ? $"Locked ({m_RequiredKey.KeyName} Required)" : "Locked";
             }
-            return m_IsOpen ? "Close" : "Open";
+            return m_IsOpen ? "Press 'E' to Close" : "Press 'E' to Open";
         }
+
+        #region Public Methods
+
+        /// <summary>
+        /// Kapının durumunu dışarıdan (örn: Switch ile) değiştirmek için kullanılır.
+        /// </summary>
+        public void SetState(bool isOpen)
+        {
+            if (m_IsLocked && isOpen) return; // Kilitliyse açmaya zorlama
+
+            m_IsOpen = isOpen;
+            if (m_Animator != null)
+            {
+                m_Animator.SetBool(k_AnimParamOpen, m_IsOpen);
+            }
+        }
+
+        public void SetLocked(bool isLocked)
+        {
+            m_IsLocked = isLocked;
+
+            if (m_IsLocked && m_IsOpen)
+            {
+                SetState(false);
+            }
+        }
+
+        public void SetRequiredKey(KeyData key)
+        {
+            m_RequiredKey = key;
+        }
+
+        #endregion
     }
 }

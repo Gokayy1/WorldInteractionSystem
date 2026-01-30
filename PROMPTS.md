@@ -1,8 +1,8 @@
 # LLM Kullanım Dokümantasyonu
 
 ## Özet
-- Toplam prompt sayısı: X
-- Kullanılan araçlar: Claude / Gemini
+- Toplam prompt sayısı: 19
+- Kullanılan araçlar: Gemini
 - En çok yardım alınan konular: [liste]
 
 ## Prompt 1: [Tablo Oluşturma]
@@ -216,3 +216,27 @@ Sorunun OnInteract metodunun E'ye bastığım anda çalıştırılması olarak d
 **Açıklama:**
 > InteractionDetector.cs hazırlanırken de HandleHoldInteraction() metodu vardı. Buna rağmen Gemini, bu mantık/sıralama hatasını yaptı.
 
+## Prompt 9: [Switch Mantığı]
+
+**Araç:** Gemini
+**Tarih/Saat:** 2026-01-30 , 23:15
+
+**Prompt:**
+> (Switch/Lever sistemine geçebilir miyiz diye sormuştu önceki çıktısında)
+geçebiliriz. Switch kullanmak istiyorum, Switch'i ufak bir küp olarak, Off state'de kırmızı, On state'de yeşil olacak şekilde tasarlayalım.
+Hatırlatma:
+3.3 Switch/Lever (Anahtar/Kol)
+Toggle interaction
+Başka bir nesneyi tetikleyebilmeli (örn: kapıyı açar)
+Event-based connection
+
+**Alınan Cevap (Özet):**
+> Door.cs içine dışardan kontrol için SetState() metodu ekledi. Switch.cs classını verdi. Önemli olarak Events'lerde Dynamic bool ve Static Parameters arasındaki farkı açıkladı.
+
+**Nasıl Kullandım:**
+- [x] Direkt kullandım
+- [ ] Adapte ettim
+- [ ] Reddettim
+
+**Açıklama:**
+> 

@@ -56,7 +56,7 @@ namespace InteractionSystem.Runtime.Interactables
 
         protected override string GetCurrentPrompt()
         {
-            if (m_IsOpen) return "Opened (Empty)";
+            if (m_IsOpen) return "Opened";
             return $"Hold 'E' to Open ({m_HoldDuration}s)";
         }
 
