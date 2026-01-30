@@ -28,6 +28,15 @@ namespace InteractionSystem.Runtime.Player
 
         #endregion
 
+        #region Public Properties
+
+        /// <summary>
+        /// Şu an Raycast'in çarptığı etkileşimli nesne. UI tarafından okunur.
+        /// </summary>
+        public IInteractable CurrentInteractable => m_CurrentInteractable;
+
+        #endregion
+
         #region Private Fields
 
         private IInteractable m_CurrentInteractable;
@@ -88,7 +97,7 @@ namespace InteractionSystem.Runtime.Player
             if (Physics.Raycast(ray, out RaycastHit hit, m_InteractionRange, m_InteractableLayer))
             {
                 // Çarptığımız obje IInteractable mı?
-                IInteractable interactable = hit.collider.GetComponent<IInteractable>();
+                IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
 
                 if (interactable != null)
                 {

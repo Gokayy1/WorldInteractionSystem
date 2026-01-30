@@ -1,84 +1,84 @@
 using UnityEngine;
 using InteractionSystem.Runtime.Core;
+using InteractionSystem.Runtime.Player; // Inventory erişimi için
+using InteractionSystem.Runtime.ScriptableObjects; // KeyData için
 
 namespace InteractionSystem.Runtime.Interactables
 {
-    /// <summary>
-    /// Açılıp kapanabilen kapı. Animator component'i ile çalışır.
-    /// Toggle Interaction tipindedir.
-    /// </summary>
     [RequireComponent(typeof(Animator))]
     public class Door : InteractableBase
     {
+        #region Serialized Fields
+
+        [Header("Door Settings")]
+        [Tooltip("Bu kapıyı açmak için gereken anahtar (Boş ise anahtar istemez).")]
+        [SerializeField] private KeyData m_RequiredKey;
+
+        #endregion
+
         #region Private Fields
 
         private Animator m_Animator;
         private bool m_IsOpen = false;
-        
         private const string k_AnimParamOpen = "IsOpen";
 
         #endregion
 
-        #region Unity Methods
-
         private void Awake()
         {
             m_Animator = GetComponent<Animator>();
-            
-            // Başlangıç durumunu animator'a bildir
-            if (m_Animator != null)
+            if (m_IsLocked && m_RequiredKey == null)
             {
-                m_Animator.SetBool(k_AnimParamOpen, m_IsOpen);
-            }
-            else
-            {
-                Debug.LogError($"[{nameof(Door)}] Animator component bulunamadı!", this);
+                Debug.LogWarning($"[{name}] Kapı kilitli ama anahtar atanmamış! Asla açılamaz.", this);
             }
         }
 
-        #endregion
-
-        #region Interactable Overrides
-
         public override bool OnInteract(GameObject interactor)
         {
-            // Önce Base'deki kilit kontrolünü yap (Kilitliyse false döner)
-            if (!base.OnInteract(interactor)) 
-                return false;
-
-            // Toggle işlemi (Açıksa kapat, kapalıysa aç)
-            m_IsOpen = !m_IsOpen;
-            
-            // Animator güncelle
-            if (m_Animator != null)
+            // Kilitli mi kontrol et
+            if (m_IsLocked)
             {
-                m_Animator.SetBool(k_AnimParamOpen, m_IsOpen);
+                // Anahtar kontrolü yap
+                if (m_RequiredKey != null)
+                {
+                    var inventory = interactor.GetComponent<SimpleInventory>();
+                    if (inventory != null && inventory.HasKey(m_RequiredKey))
+                    {
+                        // Anahtar var! Kilidi aç.
+                        Debug.Log($"Unlocked using {m_RequiredKey.KeyName}");
+                        m_IsLocked = false;
+                        // Kilidi açtık, şimdi kapıyı açmak için devam edebiliriz veya 
+                        // bir sonraki tıklamayı bekleyebiliriz. Genelde kullanıcı kilidi açınca kapı da açılsın ister.
+                    }
+                    else
+                    {
+                        // Anahtar yok
+                        Debug.Log("Requires Key!");
+                        // TODO: Ekrana "Need Red Key" yazısı basılabilir (Event ile)
+                        return false; 
+                    }
+                }
+                else
+                {
+                    // Kilitli ama anahtar tanımlı değil (belki lever ile açılacak)
+                    return false;
+                }
             }
 
-            // Prompt mesajını güncelle (İsteğe bağlı)
-            // m_PromptMessage = m_IsOpen ? "Close Door" : "Open Door";
+            // Normal Toggle işlemi (Artık kilitli değilse burası çalışır)
+            m_IsOpen = !m_IsOpen;
+            if (m_Animator != null) m_Animator.SetBool(k_AnimParamOpen, m_IsOpen);
 
-            return true; // Etkileşim başarılı
+            return true;
         }
 
         protected override string GetCurrentPrompt()
         {
-            if (m_IsLocked) return "Locked";
-            return m_IsOpen ? "Press 'E' to close" : m_PromptMessage; // Varsayılan prompt "Open" ise
+            if (m_IsLocked)
+            {
+                return m_RequiredKey != null ? $"Locked ({m_RequiredKey.KeyName} Required)" : "Locked";
+            }
+            return m_IsOpen ? "Close" : "Open";
         }
-
-        #endregion
-        
-        #region Public Methods
-
-        /// <summary>
-        /// Kapının kilit durumunu değiştirir. (Anahtar bulunduğunda çağrılacak)
-        /// </summary>
-        public void SetLocked(bool isLocked)
-        {
-            m_IsLocked = isLocked;
-        }
-
-        #endregion
     }
 }

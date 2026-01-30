@@ -124,3 +124,52 @@ Hold interaction ile açılır (örn: 2 saniye basılı tut)
 Açıldıktan sonra tekrar açılamaz
 "
 doğrudan case-document dosyasından bu bölümü gönderdim, iskeleti kontrol edip onayladım.
+
+## Prompt 5: [Door ile Key Mantığı]
+
+**Araç:** Gemini
+**Tarih/Saat:** 2026-01-30 , 17:50
+
+**Prompt:**
+> Key ile devam edelim çünkü Door için önemli. Eğer Door, isLocked ise, Inspector'da bir bölüm olsun ve hangi tip anahtar ile açacağını seçeyim, Örn: kırmızı veya mavi
+Key mantığını da ona göre yapalım, Red Key, Red Door'ları, Blue Key, Blue Door'ları açabilsin sadece.
+
+**Alınan Cevap (Özet):**
+> KeyData, SimpleInventory, KeyPickup classlarının iskeletini verdi. Modüler olmasını istediğim için ScriptableObject tabanlı bir mimari önerdi. Door.cs'i verdiğim anahtar mantığına göre düzenledi.
+
+**Nasıl Kullandım:**
+- [ ] Direkt kullandım
+- [ ] Adapte ettim
+- [ ] Reddettim
+- (Bu aşamada sadece Door.cs düzenlemesini aldığım için burayı boş bırakıyorum.)
+
+**Açıklama:**
+> Bu aşamada Door.cs düzenlemesini yaptıktan sonra 'Door' animasyona döndüm ve Gemini ile animasyon için Bool veya Trigger arasındaki farkları değerlendirdim. Gemini, Trigger'ın bazı durumlarda (spam vs.) sorun çıkartmaya daha müsait olduğunu söyledi, Bool ile devam ettim. Animasyonu ayarladıktan sonra test aşamasında kapının açılmadığını fark ettim. Sorunun kaynağını bulabilmek için InteractionUI.cs'i eklettim ve bu sayede Raycast'in kapıya hiç çarpmadığını gördüm. Koda döndüm ve Raycast'i içeren InteractionDetector.cs'teki 
+bu satırı: 
+"IInteractable interactable = hit.collider.GetComponent<IInteractable>();"
+
+buna:
+"IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();"
+
+dönüştürerek sorunu çözdüm. Gemini, P_Door prefab'ının hiyerarşisinden habersizdi ve bu hatanın kaynağının bu olduğunu düşünüyorum.
+
+## Prompt 6: [Key Mantığına Geçiş ve UI Feedback]
+
+**Araç:** Gemini
+**Tarih/Saat:** 2026-01-30 , 20:12
+
+**Prompt:**
+> Key mantığına devam edebiliriz, bu sırada da raycast'in çarptığı durumlarda Canvas'daki boş bir Text kutusuna, kapalı bir kapıya bakılıyorsa "Press 'E' to Open" kilitli bir kapıya bakılıyorsa "Locked" yerdeki anahtara bakıyorsa "Press 'E' to Collect" yazmayı ayarlayalım, PromptText mantığını zaten eklemiştik. Sonrasında bunu Chest için de yapacağız.
+
+**Alınan Cevap (Özet):**
+> KeyData, SimpleInventory, KeyPickup classlarının iskeletlerini onayladığımı varsayarak önceki iskeletleri doldurup gönderdi. InteractionUI.cs'e TMP eklemesi yaparak ekranda çıkacak PromptText'i yazdıracağım düzenlemeyi yaptı. Getter kullanarak bakılan objenin ne olduğuna göre TMP'yi düzenledi. 
+
+Ekstra Not:Tam burada farkına vardım ki "SimpleInventory" ve "KeyPickup" classlarını rastgele değil, Prompt 4'te verdiğim bilgilere göre isimlendirmiş.
+
+**Nasıl Kullandım:**
+- [x] Direkt kullandım
+- [ ] Adapte ettim
+- [ ] Reddettim
+
+**Açıklama:**
+> Bu tip UI'ların daha karmaşık olduğunu düşünmüştüm fakat Gemini'ın çıktısını incelerken mantığının ne kadar basit olduğunu gördüm, kusursuz çalışıyordu.

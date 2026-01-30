@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 4067000926661982400}
   - component: {fileID: 7012335261695366942}
   - component: {fileID: 8404271633783941566}
+  - component: {fileID: 6055808860868636085}
   - component: {fileID: 8235777202823803471}
   - component: {fileID: 4656033201922487404}
   - component: {fileID: 1229068799990620438}
@@ -84,7 +85,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MoveSpeed: 5
   m_Gravity: -9.81
-  m_LookSensitivity: 1
+  m_LookSensitivity: 1.5
   m_LookXLimit: 85
   m_CameraTransform: {fileID: 8764095563452968968}
   m_MoveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
@@ -107,6 +108,18 @@ MonoBehaviour:
     m_Bits: 8
   m_RaySource: {fileID: 8764095563452968968}
   m_InteractAction: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+--- !u!114 &6055808860868636085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3919607946606102648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d6b541b030173a40b10b313a6af4607, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8235777202823803471
 MonoBehaviour:
   m_ObjectHideFlags: 0
