@@ -1,14 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // TextMeshPro kullanımı için (Standart Text kullanıyorsanız UnityEngine.UI yeterli)
+using TMPro;
 using InteractionSystem.Runtime.Player;
 using InteractionSystem.Runtime.Core;
 
 namespace InteractionSystem.Runtime.UI
 {
-    /// <summary>
-    /// Oyuncunun etkileşim durumuna göre Crosshair rengini ve Prompt metnini yönetir.
-    /// </summary>
     public class InteractionUI : MonoBehaviour
     {
         #region Serialized Fields
@@ -16,12 +13,13 @@ namespace InteractionSystem.Runtime.UI
         [Header("References")]
         [SerializeField] private InteractionDetector m_Detector;
         [SerializeField] private Image m_CrosshairImage;
-        
-        [Tooltip("Etkileşim mesajının yazılacağı Text bileşeni.")]
-        [SerializeField] private TextMeshProUGUI m_PromptText; // Standart Text ise 'Text' yapın.
+        [SerializeField] private TextMeshProUGUI m_PromptText;
+
+        [Tooltip("Hold işlemini gösteren Slider.")]
+        [SerializeField] private Slider m_HoldSlider;
 
         [Header("Colors")]
-        [SerializeField] private Color m_DefaultColor = new Color(1, 1, 1, 0.5f); // Yarı saydam beyaz
+        [SerializeField] private Color m_DefaultColor = new Color(1, 1, 1, 0.5f);
         [SerializeField] private Color m_InteractableColor = Color.green;
         [SerializeField] private Color m_LockedColor = Color.red;
 
@@ -32,8 +30,10 @@ namespace InteractionSystem.Runtime.UI
         private void Start()
         {
             ValidateReferences();
-            // Başlangıçta yazıyı gizle
-            if (m_PromptText != null) m_PromptText.text = "";
+            
+            // Başlangıç temizliği
+            if (m_PromptText) m_PromptText.text = "";
+            if (m_HoldSlider) m_HoldSlider.gameObject.SetActive(false);
         }
 
         private void Update()
@@ -60,25 +60,46 @@ namespace InteractionSystem.Runtime.UI
 
             IInteractable target = m_Detector.CurrentInteractable;
 
+            // 1. Crosshair ve Prompt Güncellemesi
             if (target == null)
             {
-                // Boşluğa bakıyoruz
                 if (m_CrosshairImage) m_CrosshairImage.color = m_DefaultColor;
-                if (m_PromptText) m_PromptText.text = ""; // Yazıyı temizle
+                if (m_PromptText) m_PromptText.text = "";
             }
             else
             {
-                // Bir şeye bakıyoruz, Prompt mesajını al
                 if (m_PromptText) m_PromptText.text = target.InteractionPrompt;
 
-                // Rengi ayarla
-                if (target.IsInteractable)
+                if (m_CrosshairImage)
                 {
-                    if (m_CrosshairImage) m_CrosshairImage.color = m_InteractableColor;
+                    m_CrosshairImage.color = target.IsInteractable ? m_InteractableColor : m_LockedColor;
+                }
+            }
+
+            // 2. Hold Progress Slider Güncellemesi
+            if (m_HoldSlider != null)
+            {
+                // Slider ne zaman görünmeli?
+                // - Bir hedef varsa
+                // - Hedefin Hold süresi varsa (>0)
+                // - Oyuncu tuşa basıyorsa (IsHolding)
+                
+                bool showSlider = target != null && 
+                                  target.HoldDuration > 0 && 
+                                  m_Detector.IsHolding &&
+                                  target.IsInteractable; // Kilitliyse bar dolmaz
+
+                if (showSlider)
+                {
+                    if (!m_HoldSlider.gameObject.activeSelf) 
+                        m_HoldSlider.gameObject.SetActive(true);
+
+                    m_HoldSlider.value = m_Detector.HoldProgress;
                 }
                 else
                 {
-                    if (m_CrosshairImage) m_CrosshairImage.color = m_LockedColor;
+                    if (m_HoldSlider.gameObject.activeSelf) 
+                        m_HoldSlider.gameObject.SetActive(false);
                 }
             }
         }

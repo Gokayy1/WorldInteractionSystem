@@ -164,7 +164,7 @@ dönüştürerek sorunu çözdüm. Gemini, P_Door prefab'ının hiyerarşisinden
 **Alınan Cevap (Özet):**
 > KeyData, SimpleInventory, KeyPickup classlarının iskeletlerini onayladığımı varsayarak önceki iskeletleri doldurup gönderdi. InteractionUI.cs'e TMP eklemesi yaparak ekranda çıkacak PromptText'i yazdıracağım düzenlemeyi yaptı. Getter kullanarak bakılan objenin ne olduğuna göre TMP'yi düzenledi. 
 
-Ekstra Not:Tam burada farkına vardım ki "SimpleInventory" ve "KeyPickup" classlarını rastgele değil, Prompt 4'te verdiğim bilgilere göre isimlendirmiş.
+**Ekstra Not:** Tam burada farkına vardım ki "SimpleInventory" ve "KeyPickup" classlarını rastgele değil, Prompt 4'te verdiğim bilgilere göre isimlendirmiş.
 
 **Nasıl Kullandım:**
 - [x] Direkt kullandım
@@ -173,3 +173,46 @@ Ekstra Not:Tam burada farkına vardım ki "SimpleInventory" ve "KeyPickup" class
 
 **Açıklama:**
 > Bu tip UI'ların daha karmaşık olduğunu düşünmüştüm fakat Gemini'ın çıktısını incelerken mantığının ne kadar basit olduğunu gördüm, kusursuz çalışıyordu.
+
+## Prompt 7: [InventoryUI ve Chest Mantığı]
+
+**Araç:** Gemini
+**Tarih/Saat:** 2026-01-30 , 21:38
+
+**Prompt:**
+> Solda bir liste olsun ve bana hangi Key'den kaç taneye sahip olduğumu ve ne kadar altınım olduğunu listelesin, şimdilik sadece Red Key = 1, Blue Key = 2, Gold = 150, gibi basit bir liste olacak, ikonlarla uğraşmayalım. Burada SimpleInventory'ye bir metot ekleyelim AddGold diye ve Chest'i eklediğimizde Chestten gold çıkmasını sağlayabileceğimiz Inspector atamaları ayarlarız.
+
+**Alınan Cevap (Özet):**
+> SimpleInventory.cs güncellemesi ve yeni InventoryUI.cs, Chest.cs (Promptuma göre Chest.cs'i vermemesi gerekiyordu.). Unity Editor'de yapılacak şeyleri listeledi.
+
+**Nasıl Kullandım:**
+- [ ] Direkt kullandım
+- [x] Adapte ettim
+- [ ] Reddettim
+
+**Açıklama:**
+> Test ederken bu aşamaya kadar fark etmediğim bir hatayla karşılaştım. Sandığı press'leyerek de açabildiğimi fark ettim; 
+-Raycast çalışıyordu.
+-Sandık açılıyordu.
+-Hold çalışmıyordu.
+Sorunun OnInteract metodunun E'ye bastığım anda çalıştırılması olarak düşündüm.
+
+## Prompt 8: [Mantık Hatası Çözümü]
+
+**Araç:** Gemini
+**Tarih/Saat:** 2026-01-30 , 22:25
+
+**Prompt:**
+> Chest'i pressleyerek açabiliyorum, Hold mantığı çalışmıyor. Eğer HoldDuration 0 ise OnInteract çalışsın, eğer HoldDuration > 0 ise, miktarı süresince Holdladıktan sonra OnInteract çalışsın.
+
+**Alınan Cevap (Özet):**
+> Hatanın InteractionDetector.cs içinde olduğunu fark etti, tam olarak dediğim şeyi yaparak hatayı düzeltti.
+
+**Nasıl Kullandım:**
+- [x] Direkt kullandım
+- [ ] Adapte ettim
+- [ ] Reddettim
+
+**Açıklama:**
+> InteractionDetector.cs hazırlanırken de HandleHoldInteraction() metodu vardı. Buna rağmen Gemini, bu mantık/sıralama hatasını yaptı.
+

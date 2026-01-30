@@ -4,36 +4,17 @@ using InteractionSystem.Runtime.Core;
 
 namespace InteractionSystem.Runtime.Player
 {
-    /// <summary>
-    /// Oyuncunun kamerasından Raycast atarak IInteractable nesneleri tespit eder.
-    /// Input alır ve etkileşimi başlatır.
-    /// </summary>
     public class InteractionDetector : MonoBehaviour
     {
         #region Serialized Fields
 
         [Header("Detection Settings")]
-        [Tooltip("Etkileşim mesafesi.")]
         [SerializeField] private float m_InteractionRange = 3.0f;
-
-        [Tooltip("Raycast'in hangi layer'ları göreceği.")]
         [SerializeField] private LayerMask m_InteractableLayer;
-
-        [Tooltip("Raycast'in çıkış noktası (Genellikle MainCamera).")]
         [SerializeField] private Transform m_RaySource;
 
         [Header("Input Settings")]
-        [Tooltip("Etkileşim tuşu (Örn: E).")]
         [SerializeField] private InputActionReference m_InteractAction;
-
-        #endregion
-
-        #region Public Properties
-
-        /// <summary>
-        /// Şu an Raycast'in çarptığı etkileşimli nesne. UI tarafından okunur.
-        /// </summary>
-        public IInteractable CurrentInteractable => m_CurrentInteractable;
 
         #endregion
 
@@ -45,15 +26,23 @@ namespace InteractionSystem.Runtime.Player
 
         #endregion
 
+        #region Public Properties
+
+        public IInteractable CurrentInteractable => m_CurrentInteractable;
+        public float HoldProgress => (m_CurrentInteractable != null && m_CurrentInteractable.HoldDuration > 0) 
+            ? Mathf.Clamp01(m_HoldTimer / m_CurrentInteractable.HoldDuration) 
+            : 0f;
+
+        public bool IsHolding => m_IsHolding;
+
+        #endregion
+
         #region Unity Methods
 
         private void Awake()
         {
             if (m_RaySource == null)
-            {
                 m_RaySource = Camera.main != null ? Camera.main.transform : transform;
-                Debug.LogWarning($"[{nameof(InteractionDetector)}] RaySource atanmamış, MainCamera kullanılıyor.", this);
-            }
         }
 
         private void OnEnable()
@@ -86,103 +75,94 @@ namespace InteractionSystem.Runtime.Player
 
         #region Custom Methods
 
-        /// <summary>
-        /// Sürekli olarak ileriye Ray atar ve etkileşim nesnelerini arar.
-        /// </summary>
         private void HandleDetection()
         {
             Ray ray = new Ray(m_RaySource.position, m_RaySource.forward);
             
-            // Raycast atıyoruz
             if (Physics.Raycast(ray, out RaycastHit hit, m_InteractionRange, m_InteractableLayer))
             {
-                // Çarptığımız obje IInteractable mı?
                 IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
 
                 if (interactable != null)
                 {
-                    // Yeni bir nesneye mi baktık?
                     if (m_CurrentInteractable != interactable)
                     {
-                        ClearCurrentInteractable(); // Eskiyi temizle
+                        ClearCurrentInteractable();
                         m_CurrentInteractable = interactable;
-                        m_CurrentInteractable.OnFocus(); // Yeniye odaklan
+                        m_CurrentInteractable.OnFocus();
                     }
-                    return; // Bulduk, döngüden çık
+                    return;
                 }
             }
 
-            // Hiçbir şeye bakmıyorsak veya menzilden çıktıysak
             ClearCurrentInteractable();
         }
 
-        /// <summary>
-        /// Mevcut etkileşimi temizler (UI'ı gizler).
-        /// </summary>
         private void ClearCurrentInteractable()
         {
             if (m_CurrentInteractable != null)
             {
                 m_CurrentInteractable.OnLoseFocus();
                 m_CurrentInteractable = null;
-                
-                // Hold işlemini iptal et
-                m_IsHolding = false;
-                m_HoldTimer = 0f;
+                ResetHold();
             }
         }
 
-        /// <summary>
-        /// Input tuşuna basıldığında çağrılır.
-        /// </summary>
         private void OnInteractStarted(InputAction.CallbackContext context)
         {
-            if (m_CurrentInteractable != null)
+            if (m_CurrentInteractable == null) return;
+
+            // Eğer HoldDuration 0 veya çok küçükse, anında etkileşim (Instant)
+            if (m_CurrentInteractable.HoldDuration <= 0.1f)
             {
-                // Etkileşimi başlat
-                bool started = m_CurrentInteractable.OnInteract(this.gameObject);
-                
-                if (started && m_CurrentInteractable.HoldDuration > 0f)
-                {
-                    m_IsHolding = true;
-                    m_HoldTimer = 0f;
-                }
+                m_CurrentInteractable.OnInteract(this.gameObject);
+            }
+            else
+            {
+                // Değilse, Hold işlemini başlat (Update takip edecek)
+                m_IsHolding = true;
+                m_HoldTimer = 0f;
             }
         }
 
-        /// <summary>
-        /// Input tuşu bırakıldığında çağrılır.
-        /// </summary>
         private void OnInteractCanceled(InputAction.CallbackContext context)
         {
+            // Tuş bırakıldı, işlemi iptal et
             if (m_CurrentInteractable != null)
             {
-                m_IsHolding = false;
-                m_HoldTimer = 0f;
                 m_CurrentInteractable.OnInteractEnd();
             }
+            ResetHold();
         }
 
-        /// <summary>
-        /// Basılı tutma mantığını (Progress) yönetir.
-        /// </summary>
+        private void ResetHold()
+        {
+            m_IsHolding = false;
+            m_HoldTimer = 0f;
+        }
+
         private void HandleHoldInteraction()
         {
+            // Sadece bir şeye bakıyorsak ve tuşa basılı tutuyorsak çalışır
             if (m_IsHolding && m_CurrentInteractable != null)
             {
+                // Menzilden çıktı mı veya kilitlendi mi kontrolü (İsteğe bağlı)
+                if (!m_CurrentInteractable.IsInteractable)
+                {
+                    ResetHold();
+                    return;
+                }
+
                 m_HoldTimer += Time.deltaTime;
 
-                float progress = m_HoldTimer / m_CurrentInteractable.HoldDuration;
-                
-                // TODO: UI Manager'a progress gönderilecek (Observer Pattern veya Event ile)
-                // Debug.Log($"Hold Progress: {progress:P0}");
-
+                // Süre doldu mu?
                 if (m_HoldTimer >= m_CurrentInteractable.HoldDuration)
                 {
-                    // Süre doldu, işlem tamam
-                    m_CurrentInteractable.OnInteract(this.gameObject); // Tekrar çağırarak işlemi tamamlatabiliriz veya ayrı bir method
-                    m_IsHolding = false;
-                    m_HoldTimer = 0f;
+                    // Etkileşimi tetikle
+                    m_CurrentInteractable.OnInteract(this.gameObject);
+                    
+                    // İşlem bitti, tekrar tetiklenmemesi için resetle
+                    ResetHold();
                 }
             }
         }
