@@ -3,7 +3,10 @@
 ## Özet
 - Toplam prompt sayısı: 19
 - Kullanılan araçlar: Gemini
-- En çok yardım alınan konular: [liste]
+- En çok yardım alınan konular:
+1. **UI:** UI konusunda hala zayıf olduğumu düşünüyordum, UI'ın değişkenlik gösteren durumları hakkında yardım aldım.
+2. **Animator:** Animator hakkında yardım aldım. Stateler ve Unity'nin Animation konusunda çalışma prensibini öğrendim.
+3. **Interaction Mimarisi:** Interface ve Abstract Base Class yapısının SOLID prensiplere uygun kurulması.
 
 ## Prompt 1: [Tablo Oluşturma]
 
@@ -224,11 +227,6 @@ Sorunun OnInteract metodunun E'ye bastığım anda çalıştırılması olarak d
 **Prompt:**
 > (Switch/Lever sistemine geçebilir miyiz diye sormuştu önceki çıktısında)
 geçebiliriz. Switch kullanmak istiyorum, Switch'i ufak bir küp olarak, Off state'de kırmızı, On state'de yeşil olacak şekilde tasarlayalım.
-Hatırlatma:
-3.3 Switch/Lever (Anahtar/Kol)
-Toggle interaction
-Başka bir nesneyi tetikleyebilmeli (örn: kapıyı açar)
-Event-based connection
 
 **Alınan Cevap (Özet):**
 > Door.cs içine dışardan kontrol için SetState() metodu ekledi. Switch.cs classını verdi. Önemli olarak Events'lerde Dynamic bool ve Static Parameters arasındaki farkı açıkladı.
@@ -239,4 +237,4 @@ Event-based connection
 - [ ] Reddettim
 
 **Açıklama:**
-> 
+> Lever'ın animasyonunu yapmaya vaktim olmadığını düşündüm ve bu yüzden Switch'ten ilerledim. Aynı sebepten geri bildirimi de renkler üzerinden yapmak istedim.

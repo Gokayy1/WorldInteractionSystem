@@ -14,19 +14,13 @@ namespace InteractionSystem.Runtime.Player
         // Envanter değiştiğinde tetiklenecek event
         public event Action OnInventoryChanged;
 
-        // Sahip olunan anahtarlar (KeyData -> Miktar olarak dictionary tutabiliriz ama şimdilik list yeterli)
-        // Red Key = 1 dediğiniz için Dictionary kullanmak daha doğru olur.
         private Dictionary<KeyData, int> m_Keys = new Dictionary<KeyData, int>();
         
-        // Toplam Altın
         private int m_Gold = 0;
 
         public int Gold => m_Gold;
         public Dictionary<KeyData, int> Keys => m_Keys;
 
-        /// <summary>
-        /// Envantere altın ekler.
-        /// </summary>
         public void AddGold(int amount)
         {
             if (amount > 0)
@@ -66,19 +60,12 @@ namespace InteractionSystem.Runtime.Player
             return key != null && m_Keys.ContainsKey(key) && m_Keys[key] > 0;
         }
 
-        // Test amaçlı başlangıç değeri verebiliriz
-        private void Start()
-        {
-            AddGold(50); // Test
-        }
-
         public void RemoveKey(KeyData key)
         {
             if (key != null && m_Keys.ContainsKey(key))
             {
-                m_Keys[key]--; // Sayıyı azalt
+                m_Keys[key]--; 
 
-                // Eğer 0 veya altına düştüyse listeden tamamen çıkar
                 if (m_Keys[key] <= 0)
                 {
                     m_Keys.Remove(key);
